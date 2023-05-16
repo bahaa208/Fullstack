@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Sign In Form</title>
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="bootstrap.min.css">
+	<script src="index.js"></script>
+</head>
+<body>
+    <style>
+		body {
+			background-color: #f8f9fa;
+		}
+		.container {
+			margin-top: 50px;
+			max-width: 900px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+			border-radius: 10px;
+			padding: 40px;
+			background-color: #ffffff;
+		}
+		.card-title {
+			font-size: 36px;
+			font-weight: bold;
+			text-align: center;
+			margin-bottom: 40px;
+			color: #007bff;
+		}
+		.form-control {
+			height: 50px;
+			border-radius: 5px;
+			border-color: #e2e2e2;
+			box-shadow: none;
+			font-size: 18px;
+		}
+		.form-control:focus {
+			border-color: #007bff;
+			box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+		}
+		.form-check-input[type="radio"] {
+			margin-top: 6px;
+		}
+		.form-check-label {
+			font-size: 18px;
+			color: #6c757d;
+		}
+		 
+	</style>
+	<div class="container" style="margin-top: 100px;">
+		<div class="row justify-content-center">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title">Sign In</h4>
+						 
+							<div class="form-group">
+								<label for="username_" id="labeluser_">Username:</label>
+								<input type="text" class="form-control" id="username_" name="username">
+							</div>
+							<div class="form-group">
+								<label for="password_" id="labelpass_">Password:</label>
+								<input type="password" class="form-control" id="password_" name="password">
+							</div>
+							<div class="form-group">
+								<label for="usertype" id="imwhat">I am a:</label>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" name="usertype" id="teacher" value="teacher">
+									<label class="form-check-label" for="teacher">
+										Teacher
+									</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" name="usertype" id="student" value="student">
+									<label class="form-check-label" for="student">
+										Student
+									</label>
+								</div>
+								<div id="errorPart" style="color: red;"></div>
+                                 
+                                <button class="btn btn-success" onclick="goSignIn()" style="margin-right: 20px;">Sign In</button>
+                                <button class="btn btn-primary" onclick="goSignUp()" >Sign Up</button>
+								     
+							</div>
+                             
+						 
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	 
+</body>
+</html>
