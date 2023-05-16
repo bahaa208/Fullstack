@@ -28,9 +28,10 @@ function showTable(){
               <td>${exam.date}</td>
               <td>${exam._id}</td>
               <td>
-                  <span class="badge rounded-pill bg-success" onclick="editExamFunc(${exam.id})">Edit</span>
-                  <span class="badge rounded-pill bg-danger" onclick="deleExamFunc(${exam.id})">Dele</span>
-                  <span class="badge rounded-pill bg-warning" onclick="staticExamFunc(${exam.id})">static</span>
+                  <button type="button" class="btn btn-success" onclick="editExamFunc(${exam.id})">Edit</button>
+                  <button type="button" class="btn btn-danger" onclick="deleExamFunc(${exam.id})">Dele</button>
+                  <button type="button" class="btn btn-warning" onclick="staticExamFunc(${exam.id})">static</button>
+                   
               </td>
             </tr>`;
   }
@@ -56,12 +57,31 @@ function editExamFunc(id){
   console.log(id);
 
 
-
+  fetch("https://localhost:7218/api/Tests/" + id, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      // The data variable contains the response from the server
+      var exam = data;
+      const jsonString = JSON.stringify(exam);
+      sessionStorage.setItem('examEdit', jsonString);
+      window.location.href = "editExam.html";
+       
+    })
+    .catch(error => {
+      console.log("Error:", error);
+    });
 
 
   // at the end 
   showTable();
 }
+//done
 function deleExamFunc(id){
    
   fetch(`https://localhost:7218/api/Tests/${id}`, {
@@ -92,7 +112,7 @@ function staticExamFunc(id){
   // at the end 
   showTable();
 }
- 
+ //done
 function addExam(){
 
   var theTeacher = sessionStorage.getItem('myUser');
