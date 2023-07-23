@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="jsForTeacher.js"></script>
     <link rel="stylesheet" href="bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>Document</title>
 </head>
 <body>
@@ -26,8 +27,14 @@
           </div>
         </div>
     </nav>
+
     <div class="container">
-        <div class="row" style="padding-top: 300px; padding-bottom: 200px;">
+      <center>
+        <div id="graphX" style="display: none; height: 500px; width: 700px;">
+            
+        </div>
+      </center>
+        <div class="row" style="padding-top: 50px; padding-bottom: 200px;">
           <button class="btn btn-success" style="width: 100px;margin-bottom: 1px;"  type="button" onclick="addExam()">add exam</button>
             <table class="table table-hover">
                 <thead>

@@ -29,7 +29,7 @@ namespace EtestProject.Controllers
           {
               return NotFound();
           }
-            return await _context.GradeTable.ToListAsync();
+            return await _context.GradeTable.Include(t => t.listOfErrors).ToListAsync();
         }
 
         // GET: api/Grades/5
@@ -40,7 +40,7 @@ namespace EtestProject.Controllers
           {
               return NotFound();
           }
-            var grade = await _context.GradeTable.FindAsync(id);
+            var grade = await _context.GradeTable.Include(t => t.listOfErrors).FirstOrDefaultAsync(ut => ut.Id == id);
 
             if (grade == null)
             {

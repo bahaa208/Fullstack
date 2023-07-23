@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Quiz Form</title>
+    <script src="index_API.js"></script>
+	<!-- Include Bootstrap CSS -->
+	<link rel="stylesheet" href="bootstrap.min.css">
+	<!-- Optional Bootstrap theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+</head>
+<body>
+	<div class="container">
+		<h2>Take Question Form Quiz API</h2>
+	 
+			<div class="form-group">
+				<label for="category">Category:</label>
+				<select id="category" name="category" class="form-control">
+					<option value="linux">Linux</option>
+					<option value="bash">Bash</option>
+					<option value="sql">SQL</option>
+                    <option value="sql">Docker</option>
+                    <option value="sql">Code</option>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="difficulty">Difficulty:</label>
+				<select id="difficulty" name="difficulty" class="form-control">
+					<option value="easy">Easy</option>
+					<option value="medium">Medium</option>
+					<option value="hard">Hard</option>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="numQuestions">Number of Questions:</label>
+				<input type="number" id="numQuestions" name="numQuestions" class="form-control" min="1" max="10">
+			</div>
+			<br>
+
+			<div id="errorMessage1" style="display: none; background-color: red; color: white; padding: 10px; text-align: center;">
+				Error: choose number of question
+			</div>
+			<button  class="btn btn-primary" onclick="sendToServer()">Start Quiz</button>
+		 
+	</div>
+    <center style="margin: 50px;">
+		<table id="quiz-table" class="table table-bordered table-striped">
+			<thead>
+			  
+			</thead>
+			<tbody>
+			</tbody>
+		  </table>
+	</center>
+      
+	<!-- Include Bootstrap JS -->
+	<div class="d-grid gap-2" style="margin-left: 40%;margin-right: 40%;">
+		<button class="btn btn-lg btn-primary"  onclick="backToPage()" type="button">done ! </button>
+		 
+	  </div>
+	
+</body>
+</html>

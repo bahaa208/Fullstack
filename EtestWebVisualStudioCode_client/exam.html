@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Number Graph</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Number Graph</h1>
+    
+   
+    
+</body>
+</html>
+<script>
+    // Function to draw the graph
+    function drawGraph(numbers) {
+        var ctx = document.getElementById('numberGraph').getContext('2d');
+        var data = {
+            labels: Array.from({length: 101}, (_, i) => i), // Array from 0 to 100
+            datasets: [{
+                label: 'grade',
+                data: numbers,
+                borderColor: 'blue',
+                backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                fill: true
+            }]
+        };
+        var options = {
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Value'
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Number'
+                    }
+                }
+            }
+        };
+        var myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: options
+        });
+    }
+
+    // Example usage:
+    var numbersList = [10, 25, 50, 75, 90];
+    drawGraph(numbersList);
+</script>

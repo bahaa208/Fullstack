@@ -29,7 +29,7 @@ namespace EtestProject.Controllers
           {
               return NotFound();
           }
-            return await _context.QuestionTable.ToListAsync();
+            return await _context.QuestionTable.Include(t => t.listAnswer).ToListAsync();
         }
 
         // GET: api/Questions/5
@@ -40,7 +40,7 @@ namespace EtestProject.Controllers
           {
               return NotFound();
           }
-            var question = await _context.QuestionTable.FindAsync(id);
+            var question = await _context.QuestionTable.Include(t => t.listAnswer).FirstOrDefaultAsync(ut => ut.Id == id);
 
             if (question == null)
             {

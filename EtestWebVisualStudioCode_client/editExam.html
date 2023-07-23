@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Exam</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1>Edit Exam</h1>
+     
+      <div class="mb-3">
+        <label for="name" class="form-label">Name:</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="date" class="form-label">Date:</label>
+        <input type="datetime-local" class="form-control" id="date" name="date" required>
+      </div>
+      
+      <div class="mb-3">
+        <label for="time" class="form-label">id Exam:</label>
+        <input type="number" class="form-control" id="_idExam" name="iii" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="time" class="form-label">Time (in minutes):</label>
+        <input type="number" class="form-control" id="time" name="time" required>
+      </div>
+
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="random" name="random">
+        <label class="form-check-label" for="random">Random</label>
+      </div>
+
+      <center><h1>editQuestion</h1></center>
+      <br>
+      <center>
+        
+      <button type="submit" onclick="addQuestion(1)" class="btn btn-success" style="margin-right: 50px;">+open question</button>
+      <button type="submit" onclick="addQuestion(0)" class="btn btn-success">+amrican question</button>
+      <button type="submit" style="margin-left: 50px;" onclick="movePageToApiQue()" class="btn btn-secondary">+API question</button>
+      <div id="addQScreen"></div>
+      </center>
+      <br>
+      <br>
+      <center> <div id="questionEdit"></div> </center>
+      <button type="submit" onclick="save()" class="btn btn-primary">Save</button>
+      <br>
+      <br>
+      <img src="image/backI.png" onclick="backPage()" style="width: 50px; height: 50px; margin: 40px;">
+
+      <br>
+
+
+     
+  </div>
+
+  <!-- Bootstrap JS -->
+   
+  <script>
+    
+    var exam = sessionStorage.getItem('examEdit');
+
+    // Parse the JSON string back into an object
+    exam = JSON.parse(exam);
+
+    document.getElementById('name').value = exam.name;
+    document.getElementById('date').value = exam.date;
+    document.getElementById('time').value = exam.time;
+    document.getElementById('_idExam').value = exam._id;
+    document.getElementById('random').checked = exam.random;
+    // Handle form submission
+    function save() {
+        // Populate the form with the exam data
+        
+
+      // Retrieve the updated values from the form
+      var updatedExam = {
+        id: exam.id,
+        name: document.getElementById('name').value,
+        _id: document.getElementById("_idExam").value,
+        date:  document.getElementById('date').value,
+        nameOfTeacher:exam.nameOfTeacher,
+        time: parseInt(document.getElementById('time').value),
+        random: document.getElementById('random').checked,
+        allQuestionInTest: exam.allQuestionInTest,
+                user_teacherId: exam.user_teacherId
+                };
+      
+      console.log(updatedExam);
+      // Perform the update request
+      fetch('https://localhost:7218/api/Tests/' + exam.id, {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedExam)
+      }).then(data => {
+              // The data variable contains the response from the server
+              var theTeacher = sessionStorage.getItem('myUser');
+
+            // Parse the JSON string back into an object
+            var _theTeacher = JSON.parse(theTeacher);
+            _theTeacher.tests = _theTeacher.tests.filter(function(test) {
+                return test.id !== exam.id;
+            });
+            _theTeacher.tests.push(updatedExam);
+              const jsonString = JSON.stringify(_theTeacher);
+              sessionStorage.setItem('myUser', jsonString);
+              window.location.href = "teacherPage.html";
+            })
+
+            
+         
+        .catch(error => {
+          console.log("Error:", error);
+        });
+    };
+
+
+
+
+    function deleteQuestion(id){
+      fetch(`https://localhost:7218/api/Questions/${id}`, {
+        method: "DELETE"
+        }
+      );
+
+
+      var exam__ = sessionStorage.getItem('examEdit');
+      var exam_ = JSON.parse(exam__);
+       
+      exam_.allQuestionInTest =exam_.allQuestionInTest.filter(function(qq) {
+        return qq.id !== id;
+      });
+      
+      const jsonString = JSON.stringify(exam_);
+      sessionStorage.setItem('examEdit', jsonString);
+     
+       
+      showQustion();
+    }
+     
+
+
+    
+    function showQustion(){
+      var QuestionScreen = document.getElementById('questionEdit');
+      var exam_ = sessionStorage.getItem('examEdit');
+      exam_ = JSON.parse(exam_);
+      var questions = exam_.allQuestionInTest;
+      var string_=``;
+      for(var i =0;i<questions.length;i++){
+        var q = questions[i];
+        if(!q.isOpen){
+          var s =`<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                  <div class="toast-header">
+                    <strong class="me-auto">amrican Question</strong>
+                     
+                    <button type="button" class="btn-close ms-2 mb-1" onclick="deleteQuestion(${q.id})"  data-bs-dismiss="toast"  >
+                      <span aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div class="toast-body" style="text-align: left; position: relative;">
+                   <h4>${i+1}) ${q.questionText}     </h4>
+                  `;
+          for(var t=0;t<q.listAnswer.length;t++){
+            s+=`<p>   ${t+1}) ${q.listAnswer[t].text}</p>`;
+          }
+
+
+
+
+
+
+          s+= `</div>
+                </div>`;
+              
+        string_+=s;      
+        }
+        else{
+          var s =`<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                  <div class="toast-header">
+                    <strong class="me-auto">Open Question</strong>
+                     
+                    <button type="button" class="btn-close ms-2 mb-1" onclick="deleteQuestion(${q.id})"  data-bs-dismiss="toast"  >
+                      <span aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div class="toast-body" style="text-align: left; position: relative;">
+                    <h4>${i+1}) ${q.questionText}  </h4>
+                  </div>
+                </div>`;
+          string_+=s;      
+        }
+      }
+      QuestionScreen.innerHTML = string_;
+ 
+    }
+    
+    showQustion();
+  function addQuestion(i){
+    
+    /*
+
+    [
+      {
+        id: 0,
+        text: "string",
+        questionId: 0
+      }
+    ]
+
+    */
+   
+      if(i){
+        var box = document.getElementById('addQScreen');
+        box.innerHTML = `<br>
+        <input class="form-control form-control-lg" type="text" placeholder="Enter a Question" id="inputLarge0">
+        <br><button type="button" onclick="saveInformationOfQuestion(${i})" class="btn btn-success">save</button>`;
+      }
+      else{
+        var box = document.getElementById('addQScreen');
+        box.innerHTML = `<br>
+        <label class="col-form-label mt-4" for="inputDefault"><strong>Text</strong></label>
+        <input class="form-control form-control-lg" type="text" placeholder="Enter a Question" id="inputLarge0">
+
+
+
+
+
+        
+        <label class="col-form-label mt-4" for="inputDefault"><strong>options</strong></label>
+        <input type="text" class="form-control" placeholder="option1" id="inputDefault1">
+
+         <input type="text" class="form-control" placeholder="option2" id="inputDefault2">
+
+         <input type="text" class="form-control" placeholder="option3" id="inputDefault3">
+
+         <input type="text" class="form-control" placeholder="option4" id="inputDefault4">
+        
+         <div style="text-align: left; position: relative;"><br><br>    <strong>true option</strong>
+          <div id="errorMessage" style="display: none; background-color: red; color: white; padding: 10px; text-align: center;">
+  Error: Something went wrong!
+</div>
+        <br>
+  <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked="">
+  <label class="btn btn-outline-primary" for="btnradio1">option 1</label>
+  <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked="">
+  <label class="btn btn-outline-primary" for="btnradio2">option 2</label>
+  <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" checked="">
+  <label class="btn btn-outline-primary" for="btnradio3">option 3</label>
+  <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off" checked="">
+  <label class="btn btn-outline-primary" for="btnradio4">option 4</label>
+</div>
+         
+        <br><button type="button" onclick="saveInformationOfQuestion(${i})" class="btn btn-success">save</button>`;
+      
+
+      }
+
+
+
+
+
+    
+  }
+  function getIndexOfSelectedRadio() {
+    const radioButtons = document.querySelectorAll('input[name="btnradio"]');
+    
+    for (let i = 0; i < radioButtons.length; i++) {
+      if (radioButtons[i].checked) {
+        return i;
+      }
+    }
+
+    // If no radio button is selected, return -1 (or any other appropriate value).
+    return -1;
+  }
+  function saveInformationOfQuestion(i){
+    var txt="";
+    var lisTA=[];
+
+    if(i){
+      txt = document.getElementById('inputLarge0').value;
+      if(txt===""){showErrorMessage();return;}
+    }
+    else{
+      txt = document.getElementById('inputLarge0').value;
+      for(y=1;y<5;y++){
+        var t = document.getElementById('inputDefault'+y).value;
+        if(t!=""){
+          var ele = {
+        id: 0,
+        text: t,
+        questionId: 0
+      }
+          lisTA.push(ele);
+        }
+      }
+      console.log(txt+lisTA);
+      if(txt===""){showErrorMessage();return;}
+      if(lisTA.length===0){showErrorMessage();return;}
+    }
+    var p = getIndexOfSelectedRadio();
+    if(lisTA.length<p){
+      showErrorMessage();
+      return;
+    }
+
+    saveQ(i,txt,lisTA,p);
+  }
+    function  saveQ(i,txt,lisTA,p){
+    var exam__ = sessionStorage.getItem('examEdit');
+
+    // Parse the JSON string back into an object
+    var _exam = JSON.parse(exam__);
+    var idex = _exam.id;
+    if(i){
+       
+      
+
+
+  var qus={
+    
+  id: 0,
+  questionText: txt,
+  correctAnswer: 0,
+  questionURLImageText: "string",
+  listAnswer: lisTA,
+  count: 0,
+  testId: idex,
+  studentChoose: 0,
+  valueOfQuestion: 0,
+  isOpen: 1
+
+  }
+  fetch("https://localhost:7218/api/Questions",
+            {method:"POST",
+             headers:{'Accept':'application/json',
+                      'Content-Type':'application/json'},
+                body:JSON.stringify(qus)}
+            ).then(response => response.json())
+            .then(data => {
+              // The data variable contains the response from the server
+              qus.id = data.id;
+              _exam.allQuestionInTest.push(qus);
+              const jsonString = JSON.stringify(_exam);
+              sessionStorage.setItem('examEdit', jsonString);
+               showQustion();
+            })
+            .catch(error => {
+              console.log('Error:', error);
+            });
+            // at the end 
+  
+
+    }
+    else{
+      
+
+
+  var qus={
+    
+    id: 0,
+    questionText: txt,
+    correctAnswer: p,
+    questionURLImageText: "string",
+    listAnswer: lisTA,
+    count: 0,
+    testId: idex,
+    studentChoose: 0,
+    valueOfQuestion: 0,
+    isOpen: 0
+  
+    }
+    fetch("https://localhost:7218/api/Questions",
+              {method:"POST",
+               headers:{'Accept':'application/json',
+                        'Content-Type':'application/json'},
+                  body:JSON.stringify(qus)}
+              ).then(response => response.json())
+              .then(data => {
+                // The data variable contains the response from the server
+                qus.id = data.id;
+                _exam.allQuestionInTest.push(qus);
+                const jsonString = JSON.stringify(_exam);
+                sessionStorage.setItem('examEdit', jsonString);
+                 showQustion();
+              })
+              .catch(error => {
+                console.log('Error:', error);
+              });
+              // at the end 
+    
+  
+  
+    }
+    var box = document.getElementById('addQScreen');
+        box.innerHTML = ``;
+  }
+  
+  function editQuestion(id){
+
+  }
+  function showErrorMessage() {
+    const errorMessageElement = document.getElementById('errorMessage');
+
+    // Show the error message
+    errorMessageElement.style.display = 'block';
+
+    // Hide the error message after 3 seconds
+    setTimeout(() => {
+      errorMessageElement.style.display = 'none';
+    }, 3000); // 3000 milliseconds = 3 seconds
+  }
+  function backPage(){
+  window.location.href = 'teacherPage.html';
+}
+
+function movePageToApiQue(){
+  
+  
+  window.location.href = 'index_API.html';}
+  </script>
+</body>
+</html>

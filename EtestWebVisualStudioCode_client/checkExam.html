@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <title>check exams</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#"> </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarColor02">
+            <ul class="navbar-nav me-auto">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">check exam and give grade
+                  <span class="visually-hidden">(current)</span>
+                </a>
+              </li>
+               
+               
+            </ul>
+             
+          </div>
+        </div>
+      </nav>
+
+      <center>
+        <div class="row" style="padding-top: 300px; padding-bottom: 200px ;padding-left: 10%;padding-right: 10%;">
+               <table class="table table-hover">
+                  <thead>
+                    
+                    <tr class="table-primary">
+                      <th scope="col">Name of student</th>
+                      <th scope="col">Id of Student</th>
+                      <th scope="col">grade</th>
+                      <th scope="col">Operations</th>
+                    </tr>
+                  </thead>
+                  <tbody id="examsTable">
+                     
+                     
+                    
+                     
+                  </tbody>
+                  
+                </table>
+                 
+                  
+                 
+          </div>
+      </center>
+
+      <center>
+        <div id="theexam"></div>
+      </center>
+      <img src="image/backI.png" onclick="backPage()" style="width: 50px; height: 50px; margin: 40px;">
+
+      
+    
+</body>
+
+<script>
+
+function backPage(){
+  window.location.href = 'teacherPage.html';
+}
+
+    function showTable(){
+        var table = document.getElementById('examsTable');
+    var gradeToCheck = sessionStorage.getItem('gradeSToCheck');
+  // Parse the JSON string back into an object
+  gradeToCheck = JSON.parse(gradeToCheck);
+  
+   
+  // Display the exams in the table
+  var stringT=``;
+  for (var i = 0; i < gradeToCheck.length; i++) {
+    var grade = gradeToCheck[i];
+    stringT+=`<tr class="table-light">
+              <th scope="row">${grade.nameStudent}</th>
+              <td>${grade.idStudent}</td>
+              <td>${grade.gradeStudent}</td>
+              <td>
+                  <button type="button" class="btn btn-success" onclick="putGrade(${grade.id})">give grade</button>
+    
+              </td>
+            </tr>`;
+  }
+  table.innerHTML= stringT;
+  var screen = document.getElementById('theexam');
+  screen.innerHTML='';
+    }
+    
+    showTable();
+function showExam(grade){
+    var screen = document.getElementById('theexam');
+    var string_=``;
+      for(var i =0;i<grade.listOfErrors.length;i++){
+        var q = grade.listOfErrors[i];
+         
+          var s =`<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                  <div class="toast-header">
+                    <strong class="me-auto">${i+1})${q.questionName}</strong>
+                    <input id="pi_input${i+1}" type="range" min="0" max="100"  value="0"  />
+                    <p>Value: <output id="value${i+1}"></output></p>
+                     
+                     
+                  </div>
+                  <div class="toast-body" style="text-align: left; position: relative;">
+                    student answer)<h4> ${q.errorAnswer}     </h4>
+                    true answer)<h4> ${q.trueAnswer}     </h4>
+                  `;
+           
+
+
+
+
+
+
+          s+= `</div>
+                </div> <br>`;
+              
+        string_+=s;
+              
+        
+      }
+      screen.innerHTML = string_+`<div id="errorMessage6" style="display: none; background-color: red; color: white; padding: 10px; text-align: center;">
+        Error: Something went wrong!
+      </div>
+      <button id="btn11" type="button" onclick="save(${grade.listOfErrors.length},${grade._id})" class="btn btn-primary">save</button> <br><br><br> `;
+      {
+        
+        for(var i =1;i<grade.listOfErrors.length+1;i++){
+
+
+            const value = document.getElementById("value"+i);
+        const input = document.getElementById("pi_input"+i);
+        value.textContent = input.value;
+        input.addEventListener("input", (event) => {
+        value.textContent = event.target.value;
+         
+
+        });
+
+        }
+        }
+    }
+function save(n,id){
+    var sum=0;
+    for(var i =1;i<n+1;i++){
+
+
+    const value = document.getElementById("value"+i);
+    const input = document.getElementById("pi_input"+i);
+     sum+=parseInt(input.value);
+     
+
+    };
+    if(sum>100){
+        showErrorMessage();
+        
+    }
+    else{
+        var gradeToCheck_ = sessionStorage.getItem('gradeSToCheck');
+        // Parse the JSON string back into an object
+        gradeToCheck_ = JSON.parse(gradeToCheck_);
+        console.log(gradeToCheck_);
+        for(k=0;k<gradeToCheck_.length;k++){
+          var b = gradeToCheck_[k];
+          if(b._id==id){
+            gradeToCheck_[k].gradeStudent = sum;
+
+
+
+
+            fetch("https://localhost:7218/api/Grades/"+gradeToCheck_[k].id,
+            {method:"PUT",
+             headers:{'Accept':'application/json',
+                      'Content-Type':'application/json'},
+                body:JSON.stringify(gradeToCheck_[k])}
+            ).then()
+            .catch(error => {
+              console.log('Error:', error);
+            });
+
+
+
+          }
+        }
+        
+       
+        const jsonString_ = JSON.stringify(gradeToCheck_);
+        sessionStorage.setItem('gradeSToCheck', jsonString_);
+        showTable();
+        
+
+
+    }
+
+}
+    /**/
+
+
+  function putGrade(id){
+    var gradeToCheck = sessionStorage.getItem('gradeSToCheck');
+  // Parse the JSON string back into an object
+  gradeToCheck = JSON.parse(gradeToCheck);
+  
+   
+  // Display the exams in the table
+ 
+  for (var i = 0; i < gradeToCheck.length; i++) {
+    var grade = gradeToCheck[i];
+    if(grade.id===id){
+        showExam(grade);
+    }
+     
+  }
+
+  }
+
+
+
+
+  function showErrorMessage() {
+    const errorMessageElement = document.getElementById('errorMessage6');
+
+    // Show the error message
+    errorMessageElement.style.display = 'block';
+
+    // Hide the error message after 3 seconds
+    setTimeout(() => {
+      errorMessageElement.style.display = 'none';
+    }, 3000); // 3000 milliseconds = 3 seconds
+  }
+
+
+</script>
+</html>

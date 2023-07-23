@@ -11,6 +11,34 @@ window.addEventListener('load', function() {
   showTable();
 });
 
+
+
+{
+  fetch("https://localhost:7218/api/Grades" , {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      // The data variable contains the response from the server
+      var grade_ = data;
+      const jsonString = JSON.stringify(grade_);
+      sessionStorage.setItem('allGrades', jsonString);
+       
+       
+    })
+    .catch(error => {
+      console.log("Error:", error);
+    });
+
+}
+
+
+
+
 function showTable(){
   var table = document.getElementById("TabelOfExams");
   
@@ -30,8 +58,8 @@ function showTable(){
               <td>
                   <button type="button" class="btn btn-success" onclick="editExamFunc(${exam.id})">Edit</button>
                   <button type="button" class="btn btn-danger" onclick="deleExamFunc(${exam.id})">Dele</button>
-                  <button type="button" class="btn btn-warning" onclick="staticExamFunc(${exam.id})">static</button>
-                   
+                  <button type="button" class="btn btn-warning" id="statbutn${exam._id+""}" onclick="staticExamFunc(${exam._id+""})">static</button>
+                  <button type="button" class="btn btn-success" id="checkbutn${exam._id+""}" onclick="giveGrade(${exam._id+""})">check</button>
               </td>
             </tr>`;
   }
@@ -107,10 +135,37 @@ function deleExamFunc(id){
 }
 function staticExamFunc(id){
   console.log(id);
-
+  var allGrades_ = sessionStorage.getItem('allGrades');
+  // Parse the JSON string back into an object
+  allGrades_ = JSON.parse(allGrades_);
+  var gradeSpicifc = allGrades_.filter(function(grade) {
+    
+    return grade.idTest === id+"";
+  });
+  var butt = document.getElementById('statbutn'+id);
+  console.log(gradeSpicifc);
+  if(gradeSpicifc.length===0){
+   
+    butt.style.background='red';
+    setTimeout(() => {
+      butt.style.background='';
+    }, 1000);
+     
+     
+  }
+  else{
+    var listGrade=[];
+    for(var a=0;a< gradeSpicifc.length;a++){
+      listGrade.push(gradeSpicifc[a].gradeStudent);
+    }
+    
+    console.log(listGrade);
+    drawGraph(listGrade);
+  }
+  
 
   // at the end 
-  showTable();
+ 
 }
  //done
 function addExam(){
@@ -127,7 +182,7 @@ function addExam(){
     name: "newExam",
     _id: "---",
     date: "2023-05-16T11:19:19.692Z",
-    nameOfTeacher: "---",
+    nameOfTeacher: _theTeacher.name,
     time: 0,
     random: true,
     allQuestionInTest: [
@@ -172,4 +227,91 @@ function addExam(){
   // at the end 
   
 
+}
+function giveGrade(id){
+ 
+  var allGrades_ = sessionStorage.getItem('allGrades');
+  // Parse the JSON string back into an object
+  allGrades_ = JSON.parse(allGrades_);
+  var gradeSpicifc = allGrades_.filter(function(grade) {
+    
+    return grade.idTest === id+"";
+  });
+  var butt = document.getElementById('checkbutn'+id);
+   
+  if(gradeSpicifc.length===0){
+   
+    butt.style.background='red';
+    setTimeout(() => {
+      butt.style.background='';
+    }, 1000);
+     
+     
+  }
+  else{
+    window.location.href = 'checkExam.html';
+  const jsonString = JSON.stringify(gradeSpicifc);
+  sessionStorage.setItem('gradeSToCheck', jsonString);
+
+  }
+  
+}
+
+
+function drawGraph(numbers) {
+  const errorMessageElement = document.getElementById('graphX');
+  errorMessageElement.innerHTML = `<canvas id="numberGraph"  ></canvas>
+  <br>
+  <button type="button" onclick="closeGraph()" class="btn btn-danger">X</button>`;
+
+
+
+  var ctx = document.getElementById('numberGraph').getContext('2d');
+  var data = {
+      labels: Array.from({length: 101}, (_, i) => i), // Array from 0 to 100
+      datasets: [{
+          label: 'grade',
+          data: numbers,
+          borderColor: 'red',
+          backgroundColor: 'rgba(0, 0, 255, 0.2)',
+          fill: true
+      }]
+  };
+  var options = {
+      scales: {
+          x: {
+              display: true,
+              title: {
+                  display: true,
+                  text: 'Value'
+              }
+          },
+          y: {
+              display: true,
+              title: {
+                  display: true,
+                  text: 'Number'
+              }
+          }
+      }
+  };
+  var myLineChart = new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: options
+  });
+
+  
+
+    // Show the error message
+    errorMessageElement.style.display = 'block';
+//errorMessageElement.style.display = 'none';
+    
+}
+function closeGraph(){
+  const errorMessageElement = document.getElementById('graphX');
+
+    // Show the error message
+    //errorMessageElement.style.display = 'block';
+errorMessageElement.style.display = 'none';
 }

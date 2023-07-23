@@ -41,7 +41,7 @@ namespace EtestProject.Controllers
           {
               return NotFound();
           }
-            var test = await _context.TestTable.FindAsync(id);
+            var test = await _context.TestTable.Include(t => t.AllQuestionInTest).ThenInclude(q => q.listAnswer).FirstOrDefaultAsync(ut => ut.Id == id);
 
             if (test == null)
             {
