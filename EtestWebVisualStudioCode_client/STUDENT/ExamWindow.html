@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <title>Document</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-light" data-bs-theme="light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#"><div id="timer-display"></div></a>
+           
+        </div>
+    </nav>
+    
+    <center> <div id="theQuestions"></div> </center>
+
+    <br>
+    <br>
+    <button type="submit" onclick="save()" class="btn btn-primary">End Exam</button>
+    
+</body>
+<script>
+    
+    function shuffleList(list) {
+      for (let i = list.length - 1; i > 0; i--) {
+        const randomIndex = Math.floor(Math.random() * (i + 1));
+        [list[i], list[randomIndex]] = [list[randomIndex], list[i]];
+      }
+      return list;
+    }
+    function getList(){
+        var theExam = localStorage.getItem('examToDo');
+        // Parse the JSON string back into an object
+        theExam = JSON.parse(theExam);
+        var lis = [];
+        for(var i=0;i<theExam.allQuestionInTest.length;i++){
+            lis.push(i);
+        }
+        
+        if(theExam.random){
+            lis = shuffleList(lis);
+        }
+        
+        return lis;
+
+    }    
+    var listIndex = getList();
+     
+    function Exit(){
+        // the exam shuold end
+        window.location.href = 'studentPage.html';
+    }    
+    {
+        var theExam = localStorage.getItem('examToDo');
+        // Parse the JSON string back into an object
+        theExam = JSON.parse(theExam);
+        var minutesInput = theExam.time;
+                var timerDisplay = document.getElementById('timer-display');
+                var minutes = parseInt(minutesInput);
+                var seconds = minutes * 60;
+
+                var interval = setInterval(function() {
+                    if (seconds <= 0) {
+                        clearInterval(interval);
+                        Exit();
+                    } else {
+                        var mins = Math.floor(seconds / 60);
+                        var secs = seconds % 60;
+                        timerDisplay.innerHTML ="Time :"+ ('0' + mins).slice(-2) + ':' + ('0' + secs).slice(-2);
+                        seconds--;
+                    }
+                }, 1000);
+    }
+    function showExam(){
+        var theExam = localStorage.getItem('examToDo');
+        // Parse the JSON string back into an object
+        theExam = JSON.parse(theExam);
+        //console.log(listIndex);
+        var questionList = document.getElementById('theQuestions');
+        var s_ = ``;
+        for(var i=0;i<theExam.allQuestionInTest.length;i++){
+            var j = listIndex[i];
+            var q = theExam.allQuestionInTest[j];
+            if(q.isOpen===0){
+                // that mean amrican question
+                var text = q.questionText;
+                var options = q.listAnswer;
+                var s =`<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                  <div class="toast-header">
+                    <strong class="me-auto">amrican Question</strong>
+                     
+                    
+                      <span aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div class="toast-body" style="text-align: left; position: relative;">
+                   <h4>${i+1}) ${text}     </h4>
+                  `;
+                for(var t=0;t<q.listAnswer.length;t++){
+                    s+=`<input type="radio"   name="${text}" value="${options[t].text}">
+                     <label >${t+1}) ${options[t].text}</label><br>
+                     `;
+                }
+
+
+
+
+
+
+                s+= `</div>
+                        </div>`;
+              
+        s_+=s;      
+
+            }
+            else{
+                // that mean amrican question
+                var text = q.questionText;
+                
+                var s =`<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                  <div class="toast-header">
+                    <strong class="me-auto">amrican Question</strong>
+                     
+                    
+                      <span aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div class="toast-body" style="text-align: left; position: relative;">
+                   <h4>${i+1}) ${text}     </h4>
+                  `;
+
+                  s+=`<div class="form-group">
+                     
+                    <textarea class="form-control" id="exampleTextarea${i+1}" rows="3"></textarea>
+                    </div>`
+
+
+
+
+
+
+                s+= `</div>
+                        </div>`;
+              
+        s_+=s;      
+
+            }
+        }
+        questionList.innerHTML = s_;
+
+    }
+    
+    showExam();
+
+    function save(){
+        
+
+        var user = sessionStorage.getItem('myUser');
+        // Parse the JSON string back into an object
+        user = JSON.parse(user);
+
+        var theExam = localStorage.getItem('examToDo');
+        // Parse the JSON string back into an object
+        theExam = JSON.parse(theExam);
+        //console.log(listIndex);
+        var questionList = document.getElementById('theQuestions');
+        
+        var grade_={
+                            id: 0,
+                            nameStudent: user.name+"",
+                            nameOfExam: theExam.name+"",
+                            gradeStudent: 0,
+                            idStudent: user.id+"",
+                            idTest: theExam._id+"",
+                            user_studentId: user.id+"",
+                            listOfErrors: [] 
+                            }
+        fetch("https://localhost:7218/api/Grades",
+                {method:"POST",
+                headers:{'Accept':'application/json',
+                            'Content-Type':'application/json'},
+                    body:JSON.stringify(grade_)}
+                ).then(response => response.json())
+                .then(data => {
+                    // The data variable contains the response from the server
+                    grade_.id = data.id;
+
+                    var s_ = ``;
+                    
+                    for(var i=0;i<theExam.allQuestionInTest.length;i++){
+                        var j = listIndex[i];
+                        var q = theExam.allQuestionInTest[j];
+                        if(q.isOpen===0){
+                            // that mean amrican question
+                            var text = q.questionText;
+                            var correct = q.listAnswer[q.correctAnswer].text;
+                            var thereIsnt = true;
+                            const colorRadios = document.querySelectorAll('input[name="'+text+'"]');
+                            colorRadios.forEach(radio => {
+                                if (radio.checked) {
+                                var ch = radio.value;
+                                thereIsnt=false;
+                                
+                                fetch("https://localhost:7218/api/Errors",
+                                {method:"POST",
+                                headers:{'Accept':'application/json',
+                                            'Content-Type':'application/json'},
+                                    body:JSON.stringify({
+                                    id: 0,
+                                    questionName:text,
+                                    gradeId: grade_.id,
+                                    errorAnswer:ch,
+                                    trueAnswer: correct+""
+                                })}
+                                ) 
+                                
+                                .catch(error => {
+                                    console.log('Error:', error);
+                                });
+
+                                
+                                }
+                                            });
+                            if(thereIsnt){
+                                
+                                fetch("https://localhost:7218/api/Errors",
+                                {method:"POST",
+                                headers:{'Accept':'application/json',
+                                            'Content-Type':'application/json'},
+                                    body:JSON.stringify({
+                                    id: 0,
+                                    questionName:text,
+                                    gradeId:grade_.id,
+                                    errorAnswer:"empty",
+                                    trueAnswer:correct 
+                                })}
+                                ) 
+                                
+                                .catch(error => {
+                                    console.log('Error:', error);
+                                });
+                            }
+                            
+
+
+
+
+                            
+                        
+                    
+
+                        }
+                        else{
+                            //open Question
+                            var oq = document.getElementById('exampleTextarea'+(i+1));
+
+                            fetch("https://localhost:7218/api/Errors",
+                                {method:"POST",
+                                headers:{'Accept':'application/json',
+                                            'Content-Type':'application/json'},
+                                    body:JSON.stringify({
+                                    id: 0,
+                                    questionName:text,
+                                    gradeId:grade_.id,
+                                    errorAnswer:oq.value,
+                                    trueAnswer:"---" 
+                                })}
+                                ) 
+                                
+                                .catch(error => {
+                                    console.log('Error:', error);
+                                });
+
+                        }
+                    }
+                     
+
+                    
+                })
+                .catch(error => {
+                    console.log('Error:', error);
+                });
+                setTimeout(() => {
+                    Exit();;
+                 }, 1000);
+                 
+    }
+  
+</script>
+</html>
+
+
+
+
+
+

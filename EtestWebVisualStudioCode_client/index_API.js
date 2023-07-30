@@ -1,3 +1,5 @@
+var lisOptions=[];
+var index_=0;
 function sendToServer(){
     var cat = document.getElementById("category").value;
     var dif = document.getElementById("difficulty").value;
@@ -7,11 +9,11 @@ function sendToServer(){
     if(num===""){showErrorMessage();return;}
     var url = `https://quizapi.io/api/v1/questions?apiKey=KcS6BsZEZ3zZHbeIi7CdYH4A3FzOkAMKVMeTiCII&category=${cat}&difficulty=${dif}&limit=${num}`;
 
-
+    
     fetch(url)
     .then(response => response.json())
     .then(data => {
-        console.log(data); // replace with actual code to handle response data
+          // replace with actual code to handle response data
                 // Assuming you have the following data
          
         // Get the table element from the HTML
@@ -28,10 +30,11 @@ function sendToServer(){
         var row = document.createElement('tr');
         var lisanswer = item.answers;
         var answersString = "";
-         
+        var lis=[];
         for (var key in lisanswer) {
         if (lisanswer[key] != null) {
             answersString += lisanswer[key] + " / ";
+            lis.push(lisanswer[key]+"");
              
         }
         }
@@ -57,11 +60,11 @@ function sendToServer(){
         }
          
         c++;}
-
-        row.innerHTML = '<td >' + item.question + '</td>' + '<td>' + answersString + '</td><td>' +corranswersString  + '</td>' +'<td>' + `<button type="button" id="takeButtom${rowind}" onclick="addQuestionApi(0, '${item.question}', '*${answersString}*', ${c},${rowind})" class="btn btn-success">take</button>` + '</td>' ;
+        lisOptions.push(lis);
+        row.innerHTML = '<td >' + item.question + '</td>' + '<td>' + answersString + '</td><td>' +corranswersString  + '</td>' +'<td>' + `<button type="button" id="takeButtom${rowind}" onclick="addQuestionApi(0, '${item.question}', '${index_}', ${c},${rowind})" class="btn btn-success">take</button>` + '</td>' ;
         table.appendChild(row);
-
-
+       
+        index_++;
 
         rowind++;
         });
@@ -75,11 +78,13 @@ function sendToServer(){
 
 }
 
-function addQuestionApi(i,txt,lisTA,p,j){
+function addQuestionApi(i,txt,ind,p,j){
     var button = document.getElementById('takeButtom'+j);
     button.style.background='orange';
+     
+     
 
-    save_Q(i,txt,lisTA,p);
+    save_Q(i,txt,lisOptions[ind],p);
 }
 
 
@@ -104,12 +109,11 @@ function showErrorMessage() {
 
 
 
-function  save_Q(i,txt,lisTA_,p){
+function  save_Q(i,txt,listB,p){
     var exam__ = sessionStorage.getItem('examEdit');
-    let modifiedString = lisTA_.substring(1, lisTA_.length - 1);
+    //let modifiedString = lisTA_.substring(1, lisTA_.length - 1);
 
-    var listB = modifiedString.split('/');
-    var lisTA=[]
+    var lisTA=[];
     for(y=1;y<listB.length+1;y++){
         var t = listB[y-1];
         if(t!="" && t!="/" && t!=" "){
@@ -121,7 +125,7 @@ function  save_Q(i,txt,lisTA_,p){
           lisTA.push(ele);
         }
       }
-     
+     console.log(lisTA);
     // Parse the JSON string back into an object
     var _exam = JSON.parse(exam__);
     var idex = _exam.id;

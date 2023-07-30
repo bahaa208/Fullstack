@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exam Name Input</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Enter the Name of the Exam</h1>
+        <label for="examName">Exam Name:</label>
+        <input type="text" id="examName" required>
+        <div id="errorPart" style="color: red;"></div>
+        <button id="submitButton">Start Exam</button>
+        
+    </div>
+
+    <script>
+        function checkTimeDifference(givenDateString) {
+            // Convert the given date string to a Date object
+            var givenDate = new Date(givenDateString);
+
+            // Get the current date and time
+            var currentDate = new Date();
+
+            // Calculate the time difference in milliseconds
+            var timeDifference = givenDate - currentDate;
+
+            // Calculate the difference in minutes
+            var minutesDifference = Math.floor(timeDifference / (1000 * 60));
+            console.log(minutesDifference);
+            // Check if the given date is before the current date by a maximum of 30 minutes
+            if (minutesDifference<0) {
+                return "Pass";
+            }if (minutesDifference < 30) {
+                return "ok";
+            } else {
+                return minutesDifference;
+            }
+        }
+        document.getElementById("submitButton").addEventListener("click", function() {
+            var examName = document.getElementById("examName").value;
+
+            fetch(`https://localhost:7218/api/Tests/byname/${examName}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+                })
+                .then(response => {
+                if (!response.ok) {
+                    throw new Error("Exam not found");
+                }
+                return response.json();
+                })
+                .then(data => {
+                    console.log(data);
+                    var date = data.date;
+                    var diff = checkTimeDifference(date);
+                    // connat make the exam
+                    if(diff==="Pass"){
+                        document.getElementById("errorPart").innerHTML = "Time is Pass.";
+
+                    }
+                    // can start the exam
+                    else if(diff==="ok"){
+                        const jsonString = JSON.stringify(data);
+
+                        // Save the string in sessionStorage
+                        localStorage.setItem('examToDo', jsonString);
+                        window.location.href = "ExamWindow.html";
+
+
+
+
+                    }
+                    // should wait to the exam
+                    else{
+                        
+                        document.getElementById("errorPart").innerHTML = `you have to wait ${diff}`;
+                    }
+                    
+
+                    
+                })
+                .catch(error => {
+                    document.getElementById("errorPart").innerHTML = "exam dosnt exist"; // Log the error to the console for debugging purposes
+                    // Handle the error gracefully without further actions
+                });
+                        
+                        // Here, you can perform any additional actions with the entered examName
+                    });
+    </script>
+
+</body>
+</html>

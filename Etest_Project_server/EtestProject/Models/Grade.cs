@@ -4,6 +4,7 @@
     {
         public int Id { get; set; }
         public string NameStudent { get; set; }
+        public string NameOfExam { get; set; }
         public int gradeStudent { get; set; }
 
         public string IdStudent { get; set; }

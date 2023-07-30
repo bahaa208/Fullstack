@@ -25,14 +25,14 @@ namespace EtestProject.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User_student>>> GetUserStudentTable()
         {
-          if (_context.UserStudentTable == null)
-          {
-              return NotFound();
-          }
-            return await _context.UserStudentTable.Include(t=>t.grades).ThenInclude(s=>s.listOfErrors).ToListAsync();
+            if (_context.UserStudentTable == null)
+            {
+                return NotFound();
+            }
+            return await _context.UserStudentTable.Include(t => t.grades).ThenInclude(s => s.listOfErrors).ToListAsync();
         }
 
-         
+
         // GET: api/User_student/{name}
         [HttpGet("{name}")]
         public async Task<ActionResult<User_student>> GetUser_student(string name)
@@ -42,7 +42,7 @@ namespace EtestProject.Controllers
                 return NotFound();
             }
 
-            var user_student = await _context.UserStudentTable.FirstOrDefaultAsync(u => u.Name == name);
+            var user_student = await _context.UserStudentTable.Include(t => t.grades).ThenInclude(s => s.listOfErrors).FirstOrDefaultAsync(u => u.Name == name);
 
             if (user_student == null)
             {

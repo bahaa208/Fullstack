@@ -51,6 +51,24 @@ namespace EtestProject.Controllers
             return test;
         }
 
+        // GET: api/Tests/name
+        [HttpGet("byname/{name}")]
+        public async Task<ActionResult<Test>> GetTestByName(string name)
+        {
+            if (_context.TestTable == null)
+            {
+                return NotFound();
+            }
+            var test = await _context.TestTable.Include(t => t.AllQuestionInTest).ThenInclude(q => q.listAnswer).FirstOrDefaultAsync(ut => ut.Name == name);
+
+            if (test == null)
+            {
+                return NotFound();
+            }
+
+            return test;
+        }
+
         // PUT: api/Tests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]

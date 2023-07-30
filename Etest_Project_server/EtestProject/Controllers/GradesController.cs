@@ -25,10 +25,10 @@ namespace EtestProject.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Grade>>> GetGradeTable()
         {
-          if (_context.GradeTable == null)
-          {
-              return NotFound();
-          }
+            if (_context.GradeTable == null)
+            {
+                return NotFound();
+            }
             return await _context.GradeTable.Include(t => t.listOfErrors).ToListAsync();
         }
 
@@ -36,10 +36,10 @@ namespace EtestProject.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Grade>> GetGrade(int id)
         {
-          if (_context.GradeTable == null)
-          {
-              return NotFound();
-          }
+            if (_context.GradeTable == null)
+            {
+                return NotFound();
+            }
             var grade = await _context.GradeTable.Include(t => t.listOfErrors).FirstOrDefaultAsync(ut => ut.Id == id);
 
             if (grade == null)
@@ -86,7 +86,6 @@ namespace EtestProject.Controllers
         [HttpPost]
         public async Task<ActionResult<Grade>> PostGrade(Grade grade)
         {
-            
           if (_context.GradeTable == null)
           {
               return Problem("Entity set 'TestContext.GradeTable'  is null.");

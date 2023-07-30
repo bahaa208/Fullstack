@@ -35,42 +35,14 @@ function buildNewUser(){
         var user = {id: 0,
             name: username,
             password: pas,
-            tests: [{
-                id: 0,
-                name: "string",
-                _id: "string",
-                date: "2023-05-08T14:55:24.658Z",
-                nameOfTeacher: "string",
-                time: 0,
-                random: true,
-                allQuestionInTest: [
-                  {
-                    id: 0,
-                    questionText: "string",
-                    correctAnswer: 0,
-                    questionURLImageText: "string",
-                    listAnswer: [
-                      {
-                        id: 0,
-                        text: "string",
-                        questionId: 0
-                      }
-                    ],
-                    count: 0,
-                    testId: 0,
-                    studentChoose: 0,
-                    valueOfQuestion: 0,
-                    isOpen: 0
-                  }
-                ],
-                user_teacherId: 0
-              }]}
+            tests: []}
             fetch("https://localhost:7218/api/User_teacher",
             {method:"POST",
              headers:{'Accept':'application/json',
                       'Content-Type':'application/json'},
                 body:JSON.stringify(user)}
             );
+            
             window.location.href = "mainWindowSignIn.html";
     }
     if(imstudent.checked){
@@ -79,23 +51,7 @@ function buildNewUser(){
             name: username,
             password: pas,
             grades: [
-              {
-                id: 0,
-                nameStudent: "string",
-                gradeStudent: 0,
-                idStudent: "string",
-                idTest: "string",
-                user_studentId: 0,
-                listOfErrors: [
-                  {
-                    id: 0,
-                    questionName: "string",
-                    gradeId: 0,
-                    errorAnswer: "string",
-                    trueAnswer: "string"
-                  }
-                ]
-              }
+               
             ]
           }
             fetch("https://localhost:7218/api/User_student",
@@ -209,7 +165,7 @@ async function goSignIn(){
 
           // Save the string in sessionStorage
           sessionStorage.setItem('myUser', jsonString);
-          window.location.href = "studentPage.html";
+          window.location.href = "STUDENT/studentPage.html";
         }
         else{
           //error

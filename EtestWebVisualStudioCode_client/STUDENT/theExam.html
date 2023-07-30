@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <center><br><br><br>
+        <div id="graphX_student" style=" height: 500px; width: 700px;">
+            
+        </div>
+      </center>
+      
+      <center> <div id="theQuestions_"></div> </center>
+    
+</body>
+<script>
+ 
+    function showExam(){
+        var theGrade = sessionStorage.getItem('examToSee');
+        // Parse the JSON string back into an object
+        theGrade = JSON.parse(theGrade);
+        console.log(theGrade);
+        var questionList = document.getElementById('theQuestions_');
+        var s_ = ` `;
+        for(var j=0;j<theGrade.listOfErrors.length;j++){
+             
+            var q = theGrade.listOfErrors[j];
+            
+                // that mean amrican question
+                var text = q.questionName;
+                var true_ = q.trueAnswer;
+                var false_ = q.errorAnswer;
+                var collor = 'red';
+                if(true_===false_){
+                    collor='green';
+                }
+                else if(true_==='---'){
+                    collor="";
+                }
+                var s =`<div class="toast show" role="alert" aria-live="assertive" style="background:${collor}" aria-atomic="true">
+                  <div class="toast-header">
+                    <strong class="me-auto">amrican Question   Point($)</strong>
+                     
+                    
+                      <span aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div class="toast-body" style="text-align: left; position: relative;">
+                   <h4>${j+1}) ${text}     </h4>
+                  `;
+                  s+=` 
+                  <label >your answer :${false_}</label><br>
+                  <label >true answer :${true_}</label><br>
+                     `;
+
+
+
+
+
+
+                s+= `</div>
+                        </div> <br>`;
+              
+        s_+=s;      
+ 
+        }
+        questionList.innerHTML = s_;
+        showGraph(theGrade.nameOfExam);
+
+    }
+showExam();
+
+function drawGraph(numbers) {
+  const errorMessageElement = document.getElementById('graphX_student');
+  errorMessageElement.innerHTML = `<canvas id="numberGraph_"  ></canvas>
+  <br>
+   `;
+
+
+
+  var ctx = document.getElementById('numberGraph_').getContext('2d');
+  var data = {
+      labels: Array.from({length: 101}, (_, i) => i), // Array from 0 to 100
+      datasets: [{
+          label: 'grade',
+          data: numbers,
+          borderColor: 'red',
+          backgroundColor: 'rgba(0, 0, 255, 0.2)',
+          fill: true
+      }]
+  };
+  var options = {
+      scales: {
+          x: {
+              display: true,
+              title: {
+                  display: true,
+                  text: 'Value'
+              }
+          },
+          y: {
+              display: true,
+              title: {
+                  display: true,
+                  text: 'Number'
+              }
+          }
+      }
+  };
+  var myLineChart = new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: options
+  });
+
+  
+
+    // Show the error message
+     
+//errorMessageElement.style.display = 'none';
+    
+}
+
+function showGraph(nameExam__){
+    fetch("https://localhost:7218/api/Grades" , {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      // The data variable contains the response from the server
+      var grade_ = data;
+      var numbers=[];
+      for(var j=0;j<grade_.length;j++){
+        var g1=grade_[j];
+        if(g1.nameOfExam===nameExam__){
+            numbers.push(g1.gradeStudent);
+        }
+      }
+      drawGraph(numbers);
+       
+       
+    })
+    .catch(error => {
+      console.log("Error:", error);
+    });
+}
+ 
+</script>
+</html>

@@ -134,7 +134,7 @@ function deleExamFunc(id){
   
 }
 function staticExamFunc(id){
-  console.log(id);
+   
   var allGrades_ = sessionStorage.getItem('allGrades');
   // Parse the JSON string back into an object
   allGrades_ = JSON.parse(allGrades_);
@@ -143,7 +143,7 @@ function staticExamFunc(id){
     return grade.idTest === id+"";
   });
   var butt = document.getElementById('statbutn'+id);
-  console.log(gradeSpicifc);
+   
   if(gradeSpicifc.length===0){
    
     butt.style.background='red';
